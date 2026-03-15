@@ -18,16 +18,16 @@ namespace DarkRP.Modules.Items
         public abstract ItemType BaseItem { get; }
         public virtual bool CanDrop => false;
         public Item Item;
-        public abstract void OnShoot(Player player);
-        public abstract void OnAim(Player player);
-        public abstract void OnReload(Player player);
-        public abstract void OnGive(Player player);
-        public abstract void OnEquip(Player player);
-        public abstract void OnUnequip(Player player);
+        public virtual void OnShoot(Player player) { }
+        public virtual void OnAim(Player player) { }
+        public virtual void OnReload(Player player) { }
+        public virtual void OnGive(Player player) { }
+        public virtual void OnEquip(Player player) { }
+        public virtual void OnUnequip(Player player) { }
 
-        public abstract void OnUsing(Player player);
+        public virtual void OnUsing(Player player) { }
 
-        public abstract void OnTick(Player player);
+        public virtual void OnTick(Player player) { }
         public CustomItemBase()
         {
         }

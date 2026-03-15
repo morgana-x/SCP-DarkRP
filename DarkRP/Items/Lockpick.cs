@@ -20,10 +20,6 @@ namespace DarkRP.Items
         DateTime nextCheckDoor = DateTime.Now;
         public virtual int LockpickingDuration => 12;
 
-        public override void OnAim(Player player)
-        {
-
-        }
         public override void OnUnequip(Player player)
         {
             LockpickingDoor = null;
@@ -42,24 +38,6 @@ namespace DarkRP.Items
             LockpickingEnd = DateTime.Now.AddSeconds(LockpickingDuration);
             LockpickingDoor = rpdoor;
             player.Notify("Lockpicking...", Modules.Players.HUD.Notification.NotifyType.Info);
-        }
-        public override void OnGive(Player player)
-        {
-
-        }
-        public override void OnUsing(Player player)
-        {
-           
-        }
-
-        public override void OnReload(Player player)
-        {
-
-        }
-
-        public override void OnShoot(Player player)
-        {
-
         }
 
         public override void OnTick(Player player)

@@ -18,39 +18,11 @@ namespace DarkRP.Items
 
         DateTime nextFire = DateTime.Now;
 
-        public override void OnAim(Player player)
-        {
-            
-        }
-
-
-        public override void OnReload(Player player)
-        {
-            
-        }
 
         public override void OnGive(Player player)
         {
            ((ParticleDisruptorItem)Item).StoredAmmo = ((ParticleDisruptorItem)Item).MaxAmmo;
       
-
-        }
-
-        public override void OnUnequip(Player player)
-        {
-           
-        }
-        public override void OnEquip(Player player)
-        {
-            
-        }
-        public override void OnUsing(Player player)
-        {
-
-        }
-
-        public override void OnTick(Player player)
-        {
 
         }
 
