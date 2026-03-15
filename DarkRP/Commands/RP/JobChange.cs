@@ -1,0 +1,33 @@
+﻿using System;
+using System.Linq;
+using CommandSystem;
+using LabApi.Features.Wrappers;
+using DarkRP.Extensions;
+using DarkRP.Modules.Entities;
+using DarkRP.Modules.Players;
+
+namespace DarkRP.Commands.RP
+{
+    [CommandHandler(typeof(ClientCommandHandler))]
+    public class JobChange : ParentCommand, ICommand
+    {
+        public override string Command { get; } = "job";
+        public override string Description { get; } = "Changes job";
+
+        public override string[] Aliases { get; } = new string[] { "setjob", "changejob" };
+        public override void LoadGeneratedCommands() { }
+
+        protected override bool ExecuteParent(ArraySegment<string> args, ICommandSender sender, out string response)
+        {
+
+            if (args.Count < 1)
+            {
+                response = "Missing arguments! Correct Usage: job <color=yellow>jobid</color>";
+                return false;
+            }
+
+
+            return Job.TryChangeJob(Player.Get(sender), args.First(), out response); ;
+        }
+    }
+}

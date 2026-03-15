@@ -1,0 +1,122 @@
+﻿using LabApi.Features.Wrappers;
+using DarkRP.Extensions;
+using DarkRP.Modules.Players.HUD;
+using DarkRP.Modules.Players.Jobs;
+using System;
+using UnityEngine;
+using Utils;
+
+namespace DarkRP.Entities
+{
+    public class MoneyPrinterConfig
+    {
+        public int IncreaseAmount { get; set; } = 50;
+        public int Rate { get; set; } = 30;
+        public int MoneyLimit { get; set; } = 20000;
+    }
+    public class money_printer : BaseEntity<MoneyPrinterConfig>
+    {
+
+        public override string Name => "Money Printer";
+        public override float MaxHealth => 50;
+
+        DateTime nextPrint = DateTime.Now;
+
+        private long _amount;
+
+        public long IncreaseAmount = 50;
+        public int Rate = 30;
+        public long Amount { get {  return _amount; } set { _amount = value; UpdateText(); } }
+
+
+        TextToy amountScreen;
+        public override void OnCreate(Vector3 position, Quaternion rotation)
+        {
+    
+            var primitive = PrimitiveObjectToy.Create(position, rotation, networkSpawn: false);
+            primitive.Type = PrimitiveType.Cube;
+            primitive.Scale = new Vector3(0.6f, 0.2f, 0.6f);
+            primitive.Color = Color.white;
+            primitive.SyncInterval = 0.1f;
+            primitive.MovementSmoothing = 200;
+            primitive.IsStatic = false;
+
+            primitive.Base.gameObject.AddComponent<Rigidbody>();
+
+            primitive.Spawn();
+
+            var interactable = InteractableToy.Create(new Vector3(0,0,0), primitive.Transform, networkSpawn:false);
+            interactable.Shape = AdminToys.InvisibleInteractableToy.ColliderShape.Box;
+            interactable.Scale = new Vector3(1.1f, 1.1f, 1.1f);
+            interactable.IsStatic = false;
+            interactable.Spawn();
+
+            amountScreen = TextToy.Create((primitive.Transform.up * 0.52f), Quaternion.Euler(90, 0, 0), primitive.Transform, networkSpawn: false);
+            amountScreen.Scale = new Vector3(0.15f, 0.15f, 0.15f);
+            amountScreen.IsStatic = false;
+            amountScreen.Spawn();
+
+            CoreObject = primitive.GameObject;
+            Interactable = interactable;
+
+ 
+
+
+            UpdateText();
+
+            IncreaseAmount = Config.IncreaseAmount;
+            Rate = Config.Rate;
+
+            nextPrint = DateTime.Now.AddSeconds(Rate);
+        }
+
+        public override void OnDamage(Player player, int amount)
+        {
+            Health -= amount;
+            if (Health <= 0)
+            {
+                Destroy();
+                if (OwnerUserId != player.UserId && Government.IsGovernment(player))
+                {
+                    var reward = 500;
+                    player.AddMoney(reward);
+                    player.Notify($"You earnt ${reward} for destroying the printer!", Notification.NotifyType.Info);
+                }
+            }
+        }
+
+        public override void OnDestroy()
+        {
+            ExplosionUtils.ServerSpawnEffect(CoreObject.transform.position, ItemType.GrenadeHE);
+        }
+
+        public override void OnInteract(Player player)
+        {
+            if (Amount <= 0) return;
+            var amount = Amount;
+            Amount = 0;
+            player.AddMoney(amount);
+            player.Notify($"Picked up ${amount}!", Notification.NotifyType.Success);
+            UpdateText();
+        }
+
+        void UpdateText()
+        {
+            amountScreen.TextFormat = $"<color #55ff55>${_amount}</color><br>";
+            if (Owner != null) 
+                amountScreen.TextFormat += Owner.GetColouredName();
+        }
+
+        public override void OnTick()
+        {
+            if (DateTime.Now < nextPrint) return;
+            if (Amount >= Config.MoneyLimit) return;
+
+            Amount += IncreaseAmount;
+            if (Amount >= Config.MoneyLimit)
+                Amount = Config.MoneyLimit;
+
+            nextPrint = DateTime.Now.AddSeconds(Rate);
+        }
+    }
+}

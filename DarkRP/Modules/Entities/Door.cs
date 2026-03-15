@@ -1,0 +1,360 @@
+﻿using CommandSystem.Commands.RemoteAdmin;
+using Interactables.Interobjects.DoorUtils;
+using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Arguments.ServerEvents;
+using LabApi.Features.Wrappers;
+using MapGeneration;
+using DarkRP.Extensions;
+using DarkRP.Modules.Players;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UserSettings.ServerSpecific;
+
+namespace DarkRP.Modules.Entities
+{
+    public class DoorDefinition
+    {
+        public string Name { get; set; } = "";
+        public List<string> Teams {  get; set; } = new List<string>();
+
+        public bool Locked { get; set; } = false; 
+        public DoorDefinition() { }
+        public DoorDefinition(string name, List<string> teams)
+        {
+            Name = name;
+            Teams = teams;
+        }
+
+        public DoorDefinition(string name)
+        {
+            Name = name;
+        }
+    }
+
+    public class DoorsConfig
+    {
+        public bool KeysCanActAsKeycard { get; set; } = false;
+        public int MaxDoors { get; set; } = 4;
+
+        public Dictionary<RoomName, DoorDefinition> DoorDefinitions { get; set; } = new Dictionary<RoomName, DoorDefinition>()
+        {
+            [RoomName.LczClassDSpawn] = new DoorDefinition("<color=#00e870>Spawn</color>", new List<string>() { "world"}),
+            [RoomName.LczCheckpointA] = new DoorDefinition("<color=#0659be>Checkpoint A</color>", new List<string>() { "government" }),
+            [RoomName.LczCheckpointB] = new DoorDefinition("<color=#0659be>Checkpoint B</color>", new List<string>() { "government" }),
+            [RoomName.LczAirlock] = new DoorDefinition("<color=#0659be>Airlock</color>", new List<string>() { "government" }),
+            [RoomName.LczGreenhouse] = new DoorDefinition("<color=#06be5f>Greenhouse</color>"),
+            [RoomName.LczGlassroom] = new DoorDefinition("<color=#00c0e8>Glass Room</color>"),
+            [RoomName.LczArmory] = new DoorDefinition("<color=#529ad5>Armoury</color>"),
+            [RoomName.Lcz914] = new DoorDefinition("<color=#fb2b45>SCP 914</color>"),
+            [RoomName.Lcz173] = new DoorDefinition("<color=#fb2b45>Containment Chamber</color>"),
+            [RoomName.LczToilets] = new DoorDefinition("<color=#00e860>Bathrooms</color>"),
+            [RoomName.Lcz330] = new DoorDefinition("<color=#fb2b45>SCP 330</color>"),
+            [RoomName.Hcz049] = new DoorDefinition("<color=#fb2b45>SCP 049</color>"),
+            [RoomName.HczArmory] = new DoorDefinition("<color=#529ad5>Armoury</color>"),
+            [RoomName.HczMicroHID] = new DoorDefinition("<color=#d552ce>Micro HID</color>"),
+            [RoomName.EzIntercom] = new DoorDefinition("<color=#52cfd5>Intercom</color>", new List<string>() { "government" }),
+            [RoomName.EzOfficeSmall] = new DoorDefinition("<color=#529ad5>Small Office</color>"),
+            [RoomName.EzOfficeLarge] = new DoorDefinition("<color=#529ad5>Large Office</color>"),
+            [RoomName.EzOfficeStoried] = new DoorDefinition("<color=#529ad5>Office</color>"),
+            [RoomName.Hcz939] = new DoorDefinition("<color=#fb2b45>SCP 330</color>", new List<string>() { "world"}),
+            [RoomName.Hcz079] = new DoorDefinition("<color=#fb2b45>SCP 079</color>"),
+            [RoomName.Hcz127] = new DoorDefinition("<color=#fb2b45>SCP 127</color>"),
+            [RoomName.HczTesla] = new DoorDefinition("", new List<string>() { "world" }),
+        };
+
+    }
+
+    public class RPDoor
+    {
+        public LabApi.Features.Wrappers.Door Door;
+        public int Price;
+
+
+        string _name = "";
+        public string Name { get { return _name; } set { _name = value; UpdateText(); } }
+
+        public TextToy[] TextScreens;
+
+        private List<string> _teams = new List<string>();
+        public List<string> Teams { get { return _teams; } set { _teams = value; UpdateText(); } }
+
+        public Player? Owner = null;
+        public List<Player> Coowners = new List<Player>();
+
+
+        public DateTime nextRepair = DateTime.Now;
+        public RPDoor(LabApi.Features.Wrappers.Door door, int price=1000)
+        {
+            Door = door;
+            Price = price;
+            TextScreens = new TextToy[2];
+            TextScreens[0] = TextToy.Create((new UnityEngine.Vector3(0,0,1) * 0.25f) + (new UnityEngine.Vector3(0, 1, 0) * 1.25f), UnityEngine.Quaternion.Euler(new UnityEngine.Vector3(0, 180, 0)), door.Transform);
+            TextScreens[1] = TextToy.Create((new UnityEngine.Vector3(0,0,-1) * 0.25f) + (new UnityEngine.Vector3(0, 1, 0) * 1.25f), UnityEngine.Quaternion.Euler(new UnityEngine.Vector3(0, 0, 0)), door.Transform);
+            UpdateText();
+            TextVisible(true);
+        }
+
+        public bool Owned => Teams.Count > 0 || Owner != null;
+        public void UpdateText()
+        {
+            string name = Name;
+            if (name.Trim().Replace(" ","") != "")
+                name = $"[{name}<color=white>]";
+            string text = $"{name}<br>";
+
+           
+            if (!Owned)
+                text += $"Press F2 to purchase<br><color #55ff55>${Price}</color><br>";
+
+            foreach (var t in Teams)
+                text += $"{Modules.Players.Job.GetColouredTeamName(t)}<br>";
+
+            if (Owner != null) 
+                text += $"{Owner.GetColouredName()}<br>";
+            foreach (var coowner in Coowners)
+                text += $"{coowner.GetColouredName()}<br>";
+
+            foreach (var t in TextScreens)
+            {
+                t.TextFormat = text;
+                t.Spawn();
+            }
+
+        }
+
+        public void SetOwner(Player? p)
+        {
+            Owner = p;
+            Coowners.Clear();
+            _name = Entities.Door.GetDefaultDoorDefinition(this).Name;
+            if (Owner == null && Door.IsLocked) { Door.Lock(DoorLockReason.AdminCommand, false); }
+            UpdateText();
+        }
+        
+        public void AddCoOwner(Player p)
+        {
+            if (!Coowners.Contains(p))
+                Coowners.Add(p);
+            UpdateText();
+        }
+        public void RemoveCoOwner(Player p)
+        {
+            if (Coowners.Contains(p))
+                Coowners.Remove(p);
+            UpdateText();
+        }
+        public bool HasPermission(Player p )
+        {
+            var job = p.GetJobInfo();
+            string team = (job != null) ? job.Team : "";
+            return Owner == p || Coowners.Contains(p) || Teams.Contains(team) ;
+        }
+        public void AddTeam(string team)
+        {
+            if (!Teams.Contains(team))
+                Teams.Add(team);
+            UpdateText();
+        }
+        public void RemoveTeam(string team)
+        {
+            if (Teams.Contains(team))
+                Teams.Remove(team);
+            UpdateText();
+        }
+
+        public void Purchase(Player p)
+        {
+            if (Owned) { return; }
+            if (p.GetMoney() < Price)
+            {
+                p.Notify("You can't afford this door!", Players.HUD.Notification.NotifyType.Error);
+                return;
+            }
+            if (Entities.Door.GetOwnedDoors(p).Count >= Modules.Entities.Door.Singleton.Config.MaxDoors)
+            {
+                p.Notify("Reached max amount of doors!", Players.HUD.Notification.NotifyType.Error);
+                return;
+            }
+            p.AddMoney(-Price);
+            SetOwner(p);
+            p.Notify($"Bought door for ${Price}!", Players.HUD.Notification.NotifyType.Success);
+        }
+
+        public void Sell()
+        {
+            var owner = Owner;
+            SetOwner(null);
+
+            owner.AddMoney((int)(Price * 0.85));
+            owner.Notify($"Sold door for ${(int)(Price * 0.85)}", Players.HUD.Notification.NotifyType.Success);
+        }
+        public void TextVisible(bool visible)
+        {
+            foreach (var t in TextScreens)
+            {
+                if (visible)
+                    t.Scale = new UnityEngine.Vector3(0.1f, 0.1f, 0.1f);
+                else
+                    t.Scale = new UnityEngine.Vector3(0, 0, 0);
+            }
+        }
+    }
+
+    public class Door : BaseModule<DoorsConfig>
+    {
+        public Dictionary<LabApi.Features.Wrappers.Door, RPDoor> Doors = new Dictionary<LabApi.Features.Wrappers.Door, RPDoor>();
+
+        public static RPDoor GetRPDoor(LabApi.Features.Wrappers.Door door)
+        {
+            if (Singleton.Doors.ContainsKey(door)) return Singleton.Doors[door];
+            return null;
+        }
+
+
+        public static List<RPDoor> GetOwnedDoors(Player p)
+        {
+            return Singleton.Doors.Values.Where((x) => { return x.Owner == p; }).ToList();
+        }
+        public static List<RPDoor> GetCoOwnedDoors(Player p)
+        {
+            return Singleton.Doors.Values.Where((x) => { return x.Coowners.Contains(p); }).ToList();
+        }
+
+        public static void SellAll(Player p)
+        {
+            foreach (var d in GetOwnedDoors(p))
+                d.Sell();
+        }
+
+        public static Door Singleton;
+        public override void Load()
+        {
+            Singleton = this;
+            LabApi.Events.Handlers.ServerEvents.WaitingForPlayers += MapGenerated;
+            LabApi.Events.Handlers.PlayerEvents.Left += PlayerLeft;
+            LabApi.Events.Handlers.ServerEvents.DoorDamaged += DoorDamaged;
+            Events.Handlers.PlayerEvents.JobChanged += JobChanged;
+            ServerSpecificSettingsSync.ServerOnSettingValueReceived += KeyPressedBuyDoor;
+        }
+        public override void Unload()
+        {
+            LabApi.Events.Handlers.ServerEvents.WaitingForPlayers -= MapGenerated;
+            LabApi.Events.Handlers.PlayerEvents.Left -= PlayerLeft;
+            LabApi.Events.Handlers.ServerEvents.DoorDamaged -= DoorDamaged;
+            Events.Handlers.PlayerEvents.JobChanged -= JobChanged;
+            ServerSpecificSettingsSync.ServerOnSettingValueReceived -= KeyPressedBuyDoor;
+            Doors.Clear();
+        }
+
+        void PlayerLeft(PlayerLeftEventArgs e)
+        {
+            foreach (var d in GetOwnedDoors(e.Player))
+                d.SetOwner(null);
+            foreach (var d in GetCoOwnedDoors(e.Player))
+                d.RemoveCoOwner(e.Player);
+        }
+
+        void DoorDamaged(DoorDamagedEventArgs e)
+        {
+            var door = GetRPDoor(e.Door);
+            if (door == null) return;
+
+            if (!(e.Door.Base is IDamageableDoor)) return;
+
+            var dmgdoor = (IDamageableDoor)e.Door.Base;
+
+            if ((dmgdoor.IsDestroyed || dmgdoor.RemainingHealth <= 0))
+            {
+                door.nextRepair = DateTime.Now.AddSeconds(180);
+            }
+        }
+        
+        void KeyPressedBuyDoor(ReferenceHub hub, ServerSpecificSettingBase b)
+        {
+            if (b.SettingId != (int)Input.InputIds.BuyDoor && b.Label != "Buy Door") return;
+
+
+            SSKeybindSetting keybind = (SSKeybindSetting)b;
+
+            if (!keybind.SyncIsPressed) return;
+
+            var p = Player.Get(hub);
+            if (p == null) return;
+
+            var door = p.GetLookingDoor();
+            if (door == null) return;
+            var rpdoor = GetRPDoor(door);
+            if (rpdoor == null) return;
+            if (rpdoor.Owner == p) { rpdoor.Sell(); return; }
+            rpdoor.Purchase(p);
+
+        }
+
+        bool isValidRPDoor(LabApi.Features.Wrappers.Door x)
+        {
+            if ((x.Base is Interactables.Interobjects.ElevatorDoor) 
+                || (x.Base is Interactables.Interobjects.CheckpointDoor)
+               // || (x.Base is Interactables.Interobjects.PryableDoor)
+                || (x.Base is Interactables.Interobjects.BasicNonInteractableDoor) 
+             // ||  (!(x.Base is Interactables.Interobjects.BreakableDoor))
+                )
+                return false;
+
+            if (!x.CanInteract)
+                return false;
+
+            if (x.Rooms.Where((x) => ((x.Name != MapGeneration.RoomName.Unnamed))).Count() == 0)
+                return false;
+
+            return true;
+        }
+
+        public static DoorDefinition GetDefaultDoorDefinition(RPDoor door)
+        {
+            
+            foreach (var r in door.Door.Rooms)
+            {
+                if (!Singleton.Config.DoorDefinitions.ContainsKey(r.Name))
+                    continue;
+                return Singleton.Config.DoorDefinitions[r.Name];
+            }
+
+            return new DoorDefinition();
+        }
+        void MapGenerated()
+        {
+            foreach (var d in LabApi.Features.Wrappers.Door.List.Where(isValidRPDoor))
+            {
+                var rpdoor = new RPDoor(d);
+                var def = GetDefaultDoorDefinition(rpdoor);
+                rpdoor.Name = def.Name;
+                rpdoor.Teams = def.Teams;
+                Doors.Add(d, rpdoor);
+            }
+        }
+
+        public override void Tick()
+        {
+            foreach(var d in Doors)
+            {
+                if (!(d.Key.Base is IDamageableDoor)) continue;
+                if (DateTime.Now < d.Value.nextRepair) continue;
+                var door = (d.Key.Base as IDamageableDoor);
+                if (!door.IsDestroyed) continue;
+                door.ServerRepair();
+            }
+        }
+
+        void JobChanged(object sender, Events.Arguments.Player.JobChangedEventArgs e)
+        {
+            foreach (var d in GetOwnedDoors(e.Player))
+                d.UpdateText();
+            foreach (var d in GetCoOwnedDoors(e.Player))
+                d.UpdateText();
+        }
+
+
+
+    }
+}

@@ -1,0 +1,114 @@
+﻿using InventorySystem.Items;
+using LabApi.Features.Wrappers;
+using DarkRP.Modules.DB;
+using DarkRP.Modules.Items;
+using DarkRP.Modules.Players;
+using DarkRP.Modules.Players.HUD;
+using System;
+using UnityEngine;
+
+namespace DarkRP.Extensions
+{
+    public static class PlayerExtensions
+    {
+        public static long GetMoney(this Player player)
+        {
+            return Money.GetMoney(player);
+        }
+
+        public static void SetMoney(this Player player, long amount)
+        {
+            Money.SetMoney(player, amount);
+        }
+
+        public static void AddMoney(this Player player, long amount)
+        {
+            Money.AddMoney(player, amount);
+        }
+
+        public static void Notify(this Player player, string text, Notification.NotifyType notifyType)
+        {
+            Notifications.Notify(player, text, type:notifyType);
+        }
+        public static void NotifyTop(this Player player, string text, Notification.NotifyType notifyType)
+        {
+            Notifications.NotifyTop(player, text, type: notifyType);
+        }
+
+        public static void SetJob(this Player player, string job)
+        {
+            Job.SetJob(player, job);
+        }
+
+        public static string GetJob(this Player player)
+        {
+            return Job.GetJob(player);
+        }
+
+        public static JobDefinition GetJobInfo(this Player player)
+        {
+            return Job.GetJobInfo(player);
+        }
+
+        public static Item AddItem(this Player player, string item, ItemAddReason reason = ItemAddReason.AdminCommand)
+        {
+            var customitem = CustomItem.GiveItem(player, item, reason);
+            if (customitem != null)
+                return customitem.Item;
+
+            if (!System.Enum.TryParse<ItemType>(item, out ItemType itemtype))
+                return null;
+
+            return player.AddItem(itemtype, reason);
+        }
+
+        public static string GetColouredName(this Player player)
+        {
+            if (player == null) return $"<color #555555>DISCONNECTED</color>";
+            var job = Job.GetJobInfo(player);
+            if (job == null) return $"<color #555555>{player.DisplayName}</color>";
+            return $"<color={job.HexColour()}>{player.DisplayName}</color>";
+        }
+
+        public static Door GetLookingDoor (this Player pl)
+        {
+            Vector3 startPos = pl.Camera.position + (pl.Camera.forward * 0.16f);
+            for (int i = 0; i < 7; i++)
+            {
+                foreach (Door v in Door.List)
+                {
+                    if (v.IsDestroyed) continue;
+                    if (v.Zone != pl.Zone) continue;
+                    if (!v.Rooms.Contains(pl.Room)) continue;
+                    if (Vector3.Distance(v.Position + Vector3.up, startPos) > 0.8f) continue;
+                    return v;
+                }
+                startPos += pl.Camera.forward;
+            }
+            return null;
+        }
+
+        public static BaseEntity GetLookingEntity(this Player pl)
+        {
+            Vector3 startPos = pl.Camera.position + (pl.Camera.forward * 0.16f);
+            for (int i = 0; i < 7; i++)
+            {
+                foreach (var v in Entity.Singleton.Entities)
+                {
+                    try
+                    {
+                        if (Vector3.Distance(v.CoreObject.transform.position, startPos) > 0.8f) continue;
+                    }
+                    catch(Exception e)
+                    {
+                        LabApi.Features.Console.Logger.Error(e);
+                        continue;
+                    }
+                    return v;
+                }
+                startPos += pl.Camera.forward;
+            }
+            return null;
+        }
+    }
+}

@@ -1,0 +1,38 @@
+<Project>
+  <!--
+    This is a special file that contains shared configuration
+    for all project files in subdirectories.
+  -->
+
+
+  <!-- Local game references -->
+  <ItemGroup Condition="Exists('$(ManagedDir)')">
+    <!-- Publicize this assembly so we can access its internal members -->
+    <Reference Include="$(ManagedDir)Assembly-CSharp.dll" Private="false" Publicize="true" />
+    <Reference Include="$(ManagedDir)Assembly-CSharp-firstpass.dll" Private="false" Publicize="true"/>
+	<Reference Include="$(ManagedDir)CommandSystem.Core.dll" Private="false" />
+	<Reference Include="$(ManagedDir)Mirror.dll" Private="false" />
+	<Reference Include="$(ManagedDir)UnityEngine.CoreModule.dll" Private="false" />
+	<Reference Include="$(ManagedDir)UnityEngine.PhysicsModule.dll" Private="false" />
+	<Reference Include="$(ManagedDir)UnityEngine.UI.dll" Private="false" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <FilesToMove 
+            Include="$(OutputPath)/*.dll" 
+            Exclude="$(OutputPath)/DarkRP.dll;$(OutputPath)/LabAPI.dll;$(OutputPath)/YamlDotNet.dll;"
+    />
+    
+  </ItemGroup>
+
+  <Target Name="DependenciesFolder" AfterTargets="AfterBuild">
+    <MakeDir Condition="!Exists('$(OutputPath)dependencies')" Directories="$(OutputPath)dependencies"/>
+    <Move SourceFiles="@(FilesToMove)" DestinationFolder="$(OutputPath)dependencies"/>
+    <Delete Files="@(FilesToMove)"/>
+
+    <Delete Condition="Exists('$(OutputPath)dependencies.zip')" Files="$(OutputPath)dependencies.zip" />
+    
+    <ZipDirectory SourceDirectory="$(OutputPath)/dependencies" DestinationFile="$(OutputPath)dependencies.zip"/>
+  </Target>
+  
+</Project>
