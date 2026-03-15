@@ -38,11 +38,6 @@ namespace DarkRP.Modules.Players
         {
             ServerEvents.WaitingForPlayers -= CreateSettings;
         }
-
-        public override void Tick()
-        {
-        
-        }
     
     }
 }

@@ -79,8 +79,5 @@ namespace DarkRP.Modules.Players
         {
             DropAll(e.Player);
         }
-        public override void Tick()
-        {
-        }
     }
 }

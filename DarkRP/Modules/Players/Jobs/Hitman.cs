@@ -50,10 +50,6 @@ namespace DarkRP.Modules.Players.Jobs
         {
             return player.GetJobInfo().Hitman;
         }
-        public override void Tick()
-        {
-            
-        }
 
         void Death(PlayerDeathEventArgs e)
         {

@@ -59,14 +59,6 @@ namespace DarkRP.Modules.DB
             ConnectDB();
         }
 
-        public override void Tick()
-        {
-            
-        }
-
-
-   
-
         public override void Unload()
         {
             if (DB != null && DB.State == System.Data.ConnectionState.Open)

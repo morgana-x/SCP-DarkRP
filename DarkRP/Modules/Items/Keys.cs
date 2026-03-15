@@ -34,10 +34,6 @@ namespace DarkRP.Modules.Items
             LabApi.Events.Handlers.ServerEvents.PickupCreated -= PickupCreated;
             LabApi.Events.Handlers.PlayerEvents.Dying -= OnDeath;
         }
-        public override void Tick()
-        {
-           
-        }
 
         public  static bool IsKey(Item item)
         {

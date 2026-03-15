@@ -13,11 +13,6 @@ namespace DarkRP.Modules.Entities
             
         }
 
-        public override void Tick()
-        {
-            
-        }
-
         public override void Unload()
         {
 

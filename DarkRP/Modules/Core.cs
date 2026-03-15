@@ -29,11 +29,6 @@ namespace DarkRP.Modules
      
         }
 
-        public override void Tick()
-        {
-           
-        }
-
         public override void Unload()
         {
             ServerEvents.WaitingForPlayers -= WaitingForPlayers;

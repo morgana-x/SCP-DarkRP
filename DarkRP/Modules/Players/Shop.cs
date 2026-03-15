@@ -207,10 +207,5 @@ namespace DarkRP.Modules.Players
             else
                 Entities.Entity.Singleton.SpawnEntity(item.Entity, p.Camera.position + p.Camera.forward*0.85f, p);
         }
-
-        public override void Tick()
-        {
-            
-        }
     }
 }
