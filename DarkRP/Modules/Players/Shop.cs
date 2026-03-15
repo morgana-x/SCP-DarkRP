@@ -200,7 +200,7 @@ namespace DarkRP.Modules.Players
             }
 
             p.AddMoney(-item.Price);
-            p.Notify($"<color #55ff55>Purchased {item.Entity} for ${item.Price}!</color>", HUD.Notification.NotifyType.Success);
+            p.Notify($"Purchased {item.Entity} for ${item.Price}!", HUD.Notification.NotifyType.Success);
 
             if (item.IsShipment)
                 SpawnShipment(p, item);
