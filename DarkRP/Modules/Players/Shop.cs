@@ -112,7 +112,7 @@ namespace DarkRP.Modules.Players
 
     }
 
-    public class Shop : BaseModule<ShopConfig>
+    public class Shop : DarkRPModule<ShopConfig>
     {
         public static Shop Singleton;
 
@@ -170,10 +170,10 @@ namespace DarkRP.Modules.Players
                 return;
             }
 
-            var ship = (spawned_shipment)Entity.Singleton.CreateEntity("spawned_shipment");
+            var ship = (spawned_shipment)Modules.Entities.Entity.Singleton.CreateEntity("spawned_shipment");
             ship.Owner = p;
             ship.SetItem(gameItem, item.ShipmentAmount, item.ShipmentAmount, p.Camera.position + p.Camera.forward * 0.5f, UnityEngine.Quaternion.Euler(0,0,0));
-            Entity.Singleton.AddSpawnedEntity(ship);
+            Modules.Entities.Entity.Singleton.AddSpawnedEntity(ship);
         }
 
         public static void BuyItem(Player p, ShopItem item)
@@ -188,12 +188,12 @@ namespace DarkRP.Modules.Players
                 p.Notify($"Cannot afford this entity!", HUD.Notification.NotifyType.Error);
                 return;
             }
-            if (!item.IsShipment && Entity.Singleton.GetEntities(p, item.Entity).Count >= item.Max)
+            if (!item.IsShipment && Entities.Entity.Singleton.GetEntities(p, item.Entity).Count >= item.Max)
             {
                 p.Notify($"Reached limit of {item.Max} {item.Entity}s!", HUD.Notification.NotifyType.Error);
                 return;
             }
-            else if (item.IsShipment && item.ShipmentAmount > 1 && Entity.Singleton.GetEntities(p, "spawned_shipment").Count >= shopConfig.MaxShipments)
+            else if (item.IsShipment && item.ShipmentAmount > 1 && Entities.Entity.Singleton.GetEntities(p, "spawned_shipment").Count >= shopConfig.MaxShipments)
             {
                 p.Notify( $"Reached limit of {shopConfig.MaxShipments} spawned_shipments!", HUD.Notification.NotifyType.Error);
                 return;
@@ -205,7 +205,7 @@ namespace DarkRP.Modules.Players
             if (item.IsShipment)
                 SpawnShipment(p, item);
             else
-                Entity.Singleton.SpawnEntity(item.Entity, p.Camera.position + p.Camera.forward*0.85f, p);
+                Entities.Entity.Singleton.SpawnEntity(item.Entity, p.Camera.position + p.Camera.forward*0.85f, p);
         }
 
         public override void Tick()

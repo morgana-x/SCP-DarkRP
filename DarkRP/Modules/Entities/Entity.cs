@@ -1,100 +1,27 @@
-﻿using LabApi.Events.Arguments.PlayerEvents;
+﻿using DarkRP.Entities;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.Scp914Events;
 using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
-using LabApi.Loader;
-using MEC;
-using Mirror;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace DarkRP
+namespace DarkRP.Modules.Entities
 {
-    public abstract class BaseEntity
-    {
-        public abstract string Name { get; }
-        public GameObject CoreObject;
-        public InteractableToy Interactable;
-        public Pickup InteractablePickup;
-
-        public Player Owner { get {
-              bool result = Player.TryGet(OwnerUserId, out Player player);
-                if (!result) return null;
-                return player;
-
-         } set { _owner = value; if (_owner != null) { OwnerUserId = _owner.UserId; } } }
-        private Player _owner;
-        public string OwnerUserId;
-        public abstract void OnTick();
-        public abstract void OnInteract(Player player);
-        public abstract void OnDamage(Player player, int amount);
-        public abstract void OnCreate(UnityEngine.Vector3 position, UnityEngine.Quaternion rotation);
-        public abstract void OnDestroy();
-
-        public float Health = 0;
-        public virtual float MaxHealth => 100;
-
-        public bool Paused = false;
-        public BaseEntity()
-        {
-        }
-        public void Spawn(UnityEngine.Vector3 position)
-        {
-            Spawn(position, new UnityEngine.Quaternion(0, 0, 0, 0));
-        }
-        public void Spawn(UnityEngine.Vector3 position, UnityEngine.Quaternion rotation)
-        {
-            Health = MaxHealth;
-            OnCreate(position, rotation);
-            DarkRPPlugin.Singleton.Entities.AddSpawnedEntity(this);
-        }
-        public void Destroy()
-        {
-            OnDestroy();
-            DarkRPPlugin.Singleton.Entities.RemoveSpawnedEntity(this);
-            if (CoreObject != null)
-                NetworkServer.Destroy(CoreObject);
-        }
-
-        public virtual void LoadConfigs()
-        {
-
-        }
-
-    }
-    public abstract class BaseEntity<TConfig> : BaseEntity where TConfig : class, new()
-    {
-        public static TConfig? Config { get; set; }
-        public override void LoadConfigs()
-        {
-
-            string filepath = DarkRPPlugin.Singleton.GetConfigPath("Entities/" + this.GetType().Name + ".yml");
-
-            if (!Directory.Exists(Directory.GetParent(filepath).FullName))
-                Directory.CreateDirectory(Directory.GetParent(filepath).FullName);
-
-            LabApi.Features.Console.Logger.Info($"Loading {this.GetType().Name + ".yml"}...");
-            if (DarkRPPlugin.Singleton.TryLoadConfig<TConfig>(filepath, out TConfig? config))
-                Config = config;
-        }
-    }
-
-    public class Entity
+    public class Entity : DarkRPModule
     {
 
         public Dictionary<string, Type> EntityMap = new Dictionary<string, Type>();
         private volatile List<BaseEntity> entities = new List<BaseEntity>();
 
-        public List<BaseEntity> Entities {  get { return entities.ToList(); } }
+        public List<BaseEntity> Entities { get { return entities.ToList(); } }
 
-        public CoroutineHandle moduleTickHandle;
 
         public static Entity Singleton;
-        public void Load()
+        public override void Load()
         {
             Singleton = this;
             var classes = Assembly.GetExecutingAssembly()
@@ -102,52 +29,48 @@ namespace DarkRP
                        .Where(t => t.IsClass && t.Namespace.StartsWith("DarkRP.Entities"))
                        .ToList();
 
-            foreach (var type in classes.Where((x) => { return x.IsSubclassOf(typeof(BaseEntity)); }))
+            foreach (var type in classes.Where((x) => { return x.IsSubclassOf(typeof(BaseEntity)) && !x.ContainsGenericParameters; }))
                 RegisterEntity(type);
 
 
-            moduleTickHandle = Timing.RunCoroutine(Tick());
             PlayerEvents.PickingUpItem += OnPicking;
             PlayerEvents.SearchingPickup += OnSearching;
             PlayerEvents.InteractedToy += OnPickingToy;
             PlayerEvents.PlacedBulletHole += ShotWeapon;
             Scp914Events.ProcessingPickup += ProcessingPickup;
         }
-        public void Unload()
+        public override void Unload()
         {
             PlayerEvents.PickingUpItem -= OnPicking;
             PlayerEvents.SearchingPickup -= OnSearching;
             PlayerEvents.InteractedToy -= OnPickingToy;
             PlayerEvents.PlacedBulletHole -= ShotWeapon;
             Scp914Events.ProcessingPickup -= ProcessingPickup;
-            Timing.KillCoroutines(moduleTickHandle);
+
+
             entities.Clear();
             EntityMap.Clear();
         }
-        private IEnumerator<float> Tick()
+        public override void Tick()
         {
-            while (true)
+            foreach (var ent in Entities)
             {
-                foreach (var ent in Entities)
+                if (ent.Paused)
+                    continue;
+                try
                 {
-                    if (ent.Paused) 
-                        continue;
-                    try
-                    {
-                        ent.OnTick();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.ToString());
-                    }
+                    ent.OnTick();
                 }
-                yield return MEC.Timing.WaitForSeconds(0.1f);
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
         public static BaseEntity GetEntity(GameObject obj)
         {
             if (obj == null) return null;
-            var result = Singleton.Entities.Where((x) => { return (x.CoreObject!=null && x.CoreObject == obj) ||  (x.Interactable != null && x.Interactable.GameObject == obj) || (x.InteractablePickup != null && x.InteractablePickup.Base != null && x.InteractablePickup.Base.gameObject == obj); }).ToList();
+            var result = Singleton.Entities.Where((x) => { return x.CoreObject != null && x.CoreObject == obj || x.Interactable != null && x.Interactable.GameObject == obj || x.InteractablePickup != null && x.InteractablePickup.Base != null && x.InteractablePickup.Base.gameObject == obj; }).ToList();
             return result.Count > 0 ? result.First() : null;
         }
         private void ShotWeapon(PlayerPlacedBulletHoleEventArgs e)
@@ -161,7 +84,7 @@ namespace DarkRP
         }
         private void ProcessingPickup(Scp914ProcessingPickupEventArgs e)
         {
-            foreach(var ent in Entities)
+            foreach (var ent in Entities)
             {
                 if (ent.InteractablePickup == null) continue;
                 if (ent.InteractablePickup == e.Pickup)
@@ -241,11 +164,11 @@ namespace DarkRP
             if (!EntityMap.ContainsKey(id)) { return null; }
             return (BaseEntity)Activator.CreateInstance(EntityMap[id]);
         }
-        public BaseEntity SpawnEntity(string id, UnityEngine.Vector3 pos, Player owner = null)
+        public BaseEntity SpawnEntity(string id, Vector3 pos, Player owner = null)
         {
-            return SpawnEntity(id, pos, new UnityEngine.Quaternion(0,0,0,0), owner);
+            return SpawnEntity(id, pos, new Quaternion(0, 0, 0, 0), owner);
         }
-        public BaseEntity SpawnEntity(string id, UnityEngine.Vector3 pos, UnityEngine.Quaternion rotation, Player? owner=null)
+        public BaseEntity SpawnEntity(string id, Vector3 pos, Quaternion rotation, Player? owner = null)
         {
             var ent = CreateEntity(id);
             if (ent == null) return null;
@@ -254,11 +177,11 @@ namespace DarkRP
             return ent;
         }
 
-        public List<BaseEntity> GetEntities(Player p, string id="")
+        public List<BaseEntity> GetEntities(Player p, string id = "")
         {
             return Entities.Where((x) =>
             {
-                return ((x.Owner != null && x.Owner == p) || (x.OwnerUserId == p.UserId)) && (id == "" || (x.GetType().Name == id));
+                return (x.Owner != null && x.Owner == p || x.OwnerUserId == p.UserId) && (id == "" || x.GetType().Name == id);
             }
             ).ToList();
         }

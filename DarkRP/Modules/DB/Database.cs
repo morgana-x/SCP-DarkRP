@@ -21,7 +21,7 @@ namespace DarkRP.Modules.DB
     }
 
 
-    public class Database : BaseModule<DatabaseConfig>
+    public class Database : DarkRPModule<DatabaseConfig>
     {
         public static MySqlConnection DB;
         public static Database Singleton;

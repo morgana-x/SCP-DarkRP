@@ -201,7 +201,7 @@ namespace DarkRP.Modules.Entities
         }
     }
 
-    public class Door : BaseModule<DoorsConfig>
+    public class Door : DarkRPModule<DoorsConfig>
     {
         public Dictionary<LabApi.Features.Wrappers.Door, RPDoor> Doors = new Dictionary<LabApi.Features.Wrappers.Door, RPDoor>();
 

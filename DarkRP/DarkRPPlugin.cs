@@ -17,7 +17,6 @@ namespace DarkRP
         public override Version RequiredApiVersion => new Version(LabApiProperties.CompiledVersion);
 
         public Module Modules;
-        public Entity Entities;
 
         public static DarkRPPlugin Singleton;
 
@@ -29,15 +28,11 @@ namespace DarkRP
             Modules = new Module();
             Modules.Load();
 
-            Entities = new Entity();
-            Entities.Load();
-
         }
 
         public override void Disable()
         {
             Modules.Unload();
-            Entities.Unload();
         }
 
 

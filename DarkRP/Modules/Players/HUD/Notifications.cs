@@ -43,7 +43,7 @@ namespace DarkRP.Modules.Players.HUD
         };
     }
 
-    public class Notifications : BaseModule<NotificationsConfig>
+    public class Notifications : DarkRPModule<NotificationsConfig>
     {
         public Dictionary<Player, List<Notification>> SideNotifications = new Dictionary<Player, List<Notification>>();
         public Dictionary<Player, List<Notification>> TopNotifications = new Dictionary<Player, List<Notification>>();

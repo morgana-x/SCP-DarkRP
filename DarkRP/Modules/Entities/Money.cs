@@ -5,12 +5,12 @@ using DarkRP.Modules.Players.HUD;
 
 namespace DarkRP.Modules.Entities
 {
-    public class Money : BaseModule
+    public class Money : DarkRPModule
     {
      
         public static BaseEntity DropMoney(UnityEngine.Vector3 Position, UnityEngine.Quaternion Rotation, long amount)
         {
-            var dropped_money = DarkRPPlugin.Singleton.Entities.CreateEntity("spawned_money");
+            var dropped_money = Entity.Singleton.CreateEntity("spawned_money");
             ((spawned_money)dropped_money).Amount = amount;
             dropped_money.Spawn(Position, Rotation);
             return dropped_money;

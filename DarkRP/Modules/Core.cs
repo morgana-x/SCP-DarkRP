@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace DarkRP.Modules
 {
-    internal class Core : BaseModule
+    internal class Core : DarkRPModule
     {
         public override void Load()
         {

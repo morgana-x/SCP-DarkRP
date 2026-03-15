@@ -10,7 +10,7 @@ namespace DarkRP.Modules.Players.Jobs
         public int MinimumPrice { get; set; } = 2000;
     }
 
-    public class Hitman : BaseModule<HitmanConfig>
+    public class Hitman : DarkRPModule<HitmanConfig>
     {
         public static Hitman Singleton;
 

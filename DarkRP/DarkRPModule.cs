@@ -6,11 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace DarkRP
 {
-    public abstract class BaseModule
+    public abstract class DarkRPModule
     {
         public abstract void Load();
         public abstract void Unload();
@@ -20,19 +19,19 @@ namespace DarkRP
         }
     }
 
-    public abstract class BaseModule <TConfig> : BaseModule where TConfig : class, new()
+    public abstract class DarkRPModule<TConfig> : DarkRPModule where TConfig : class, new()
     {
         public TConfig? Config { get; set; }
         public override void LoadConfigs()
         {
-   
-            string filepath = DarkRPPlugin.Singleton.GetConfigPath("Modules/"+ this.GetType().Name + ".yml");
+
+            string filepath = DarkRPPlugin.Singleton.GetConfigPath("Modules/" + GetType().Name + ".yml");
 
             if (!Directory.Exists(Directory.GetParent(filepath).FullName))
                 Directory.CreateDirectory(Directory.GetParent(filepath).FullName);
 
-            Logger.Info($"Loading {this.GetType().Name + ".yml"}...");
-            if (DarkRPPlugin.Singleton.TryLoadConfig<TConfig>(filepath, out TConfig? config))
+            Logger.Info($"Loading {GetType().Name + ".yml"}...");
+            if (DarkRPPlugin.Singleton.TryLoadConfig(filepath, out TConfig? config))
                 Config = config;
         }
     }
@@ -49,7 +48,7 @@ namespace DarkRP
                        .Where(t => t.IsClass && t.Namespace.StartsWith("DarkRP.Modules"))
                        .ToList();
 
-           foreach (var type in classes.Where((x) => { return x.IsSubclassOf(typeof(BaseModule)); }))
+            foreach (var type in classes.Where((x) => { return x.IsSubclassOf(typeof(DarkRPModule)); }))
                 AddModule(type);
 
             moduleTickHandle = Timing.RunCoroutine(Tick());
@@ -58,8 +57,8 @@ namespace DarkRP
         public void AddModule(Type type)
         {
             var module = Activator.CreateInstance(type);
-            ((BaseModule)module).LoadConfigs();
-            ((BaseModule)module).Load();
+            ((DarkRPModule)module).LoadConfigs();
+            ((DarkRPModule)module).Load();
             LoadedModules.Add(type, module);
             Logger.Info($"Loaded module {type.Name}");
         }
@@ -70,13 +69,13 @@ namespace DarkRP
             return null;
         }
 
-        public object GetModule<Type>() {  return GetModule(typeof(Type)); }
+        public object GetModule<Type>() { return GetModule(typeof(Type)); }
 
         public void Unload()
         {
             Timing.KillCoroutines(moduleTickHandle);
             foreach (var pair in LoadedModules)
-                ((BaseModule)pair.Value).Unload();
+                ((DarkRPModule)pair.Value).Unload();
 
             LoadedModules.Clear();
         }
@@ -89,14 +88,14 @@ namespace DarkRP
                 {
                     try
                     {
-                        ((BaseModule)pair.Value).Tick();
+                        ((DarkRPModule)pair.Value).Tick();
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex.ToString());
                     }
                 }
-                yield return MEC.Timing.WaitForSeconds(0.1f);
+                yield return Timing.WaitForSeconds(0.1f);
             }
         }
     }

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DarkRP.Modules.Map
 {
-    public class Cleanup : BaseModule
+    public class Cleanup : DarkRPModule
     {
 
         public Dictionary<Ragdoll, DateTime> Ragdolls = new Dictionary<Ragdoll, DateTime>();

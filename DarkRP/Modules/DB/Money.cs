@@ -10,7 +10,7 @@ namespace DarkRP.Modules.DB
         public int StartingMoney { get; set; } = 20000;
     }
 
-    public class Money : BaseModule<MoneyConfig>
+    public class Money : DarkRPModule<MoneyConfig>
     {
         public static Money Singleton;
         public override void Load()

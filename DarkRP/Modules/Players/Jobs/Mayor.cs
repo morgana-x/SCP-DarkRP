@@ -23,7 +23,7 @@ namespace DarkRP.Modules.Players.Jobs
 
         public bool ResetLawsOnDeath { get; set; } = true;
     }
-    public class Mayor : BaseModule<MayorConfig>
+    public class Mayor : DarkRPModule<MayorConfig>
     {
         public static List<string> Laws = new List<string>();
 

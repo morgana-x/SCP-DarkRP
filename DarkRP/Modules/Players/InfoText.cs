@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace DarkRP.Modules.Players
 {
-    internal class InfoText : BaseModule
+    internal class InfoText : DarkRPModule
     {
         public InfoText Singleton;
 

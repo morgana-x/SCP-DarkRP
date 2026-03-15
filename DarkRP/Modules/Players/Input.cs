@@ -6,7 +6,7 @@ using UserSettings.ServerSpecific;
 
 namespace DarkRP.Modules.Players
 {
-    public class Input : BaseModule
+    public class Input : DarkRPModule
     {
         public enum InputIds
         {

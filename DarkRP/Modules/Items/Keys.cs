@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DarkRP.Modules.Items
 {
-    public class Keys : BaseModule
+    public class Keys : DarkRPModule
     {
 
         public KeycardItem GiveKeys(Player p)

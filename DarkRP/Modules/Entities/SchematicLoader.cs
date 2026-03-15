@@ -6,7 +6,7 @@ using Utf8Json;
 
 namespace DarkRP.Modules.Entities
 {
-    public class SchematicLoader : BaseModule
+    public class SchematicLoader : DarkRPModule
     {
         public override void Load()
         {

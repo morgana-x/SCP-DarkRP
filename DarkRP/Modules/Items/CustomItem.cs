@@ -33,7 +33,7 @@ namespace DarkRP.Modules.Items
         }
     }
 
-    public class CustomItem : BaseModule
+    public class CustomItem : DarkRPModule
     {
         public Dictionary<string, Type> CustomItemTypes = new Dictionary<string, Type>();
         public Dictionary<Item, CustomItemBase> SpawnedCustomItems = new Dictionary<Item, CustomItemBase>();

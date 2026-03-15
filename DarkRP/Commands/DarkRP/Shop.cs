@@ -3,7 +3,7 @@ using System.Linq;
 using CommandSystem;
 using LabApi.Features.Wrappers;
 using DarkRP.Extensions;
-using DarkRP.Modules.Players;
+using DarkRP.Modules.Entities;
 
 namespace DarkRP.Commands.DarkRP
 {

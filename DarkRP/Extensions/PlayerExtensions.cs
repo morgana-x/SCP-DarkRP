@@ -6,6 +6,7 @@ using DarkRP.Modules.Players;
 using DarkRP.Modules.Players.HUD;
 using System;
 using UnityEngine;
+using DarkRP.Entities;
 
 namespace DarkRP.Extensions
 {
@@ -93,7 +94,7 @@ namespace DarkRP.Extensions
             Vector3 startPos = pl.Camera.position + (pl.Camera.forward * 0.16f);
             for (int i = 0; i < 7; i++)
             {
-                foreach (var v in Entity.Singleton.Entities)
+                foreach (var v in Modules.Entities.Entity.Singleton.Entities)
                 {
                     try
                     {

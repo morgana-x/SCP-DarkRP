@@ -54,7 +54,7 @@ namespace DarkRP.Modules.Map
         public SpawnDefinition Spawnpoint { get; set; } = new SpawnDefinition(RoleTypeId.ClassD);
     }
 
-    public class Map : BaseModule<MapConfig>
+    public class Map : DarkRPModule<MapConfig>
     {
         public static Map Singleton;
         public override void Load()

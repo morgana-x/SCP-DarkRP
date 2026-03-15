@@ -14,7 +14,7 @@ namespace DarkRP.Modules.Players.HUD
     }
 
 
-    public class HUD : BaseModule<HUDConfig>
+    public class HUD : DarkRPModule<HUDConfig>
     {
         public static HUD Singleton;
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DarkRP.Entities;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
@@ -10,7 +11,7 @@ namespace DarkRP.Modules.Players
     {
         public int MaxCapacity { get; set; } = 3;
     }
-    public class Pocket : BaseModule<PocketConfig>
+    public class Pocket : DarkRPModule<PocketConfig>
     {
         public static Pocket Singleton;
 

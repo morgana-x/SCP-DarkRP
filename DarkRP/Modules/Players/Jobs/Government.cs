@@ -15,7 +15,7 @@ namespace DarkRP.Modules.Players.Jobs
         public int WarrantExpirySeconds { get; set; } = 350;
         public int WantedExpirySeconds { get; set; } = 350;
     }
-    public class Government : BaseModule<GovernmentConfig>
+    public class Government : DarkRPModule<GovernmentConfig>
     {
 
         public class WantedStatus

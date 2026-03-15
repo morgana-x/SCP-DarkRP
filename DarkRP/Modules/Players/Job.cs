@@ -360,7 +360,7 @@ namespace DarkRP.Modules.Players
 
 
 
-    public class Job : BaseModule<JobConfig>
+    public class Job : DarkRPModule<JobConfig>
     {
 
         public static Job Singleton;
