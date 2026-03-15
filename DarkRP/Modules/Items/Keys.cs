@@ -1,5 +1,4 @@
 ﻿using Interactables.Interobjects.DoorUtils;
-using InventorySystem;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Features.Wrappers;
@@ -11,7 +10,7 @@ namespace DarkRP.Modules.Items
     public class Keys : BaseModule
     {
 
-        public LabApi.Features.Wrappers.KeycardItem GiveKeys(Player p)
+        public KeycardItem GiveKeys(Player p)
         {
             return KeycardItem.CreateCustomKeycardMetal(p, "Keys", p.DisplayName, "Keys", new KeycardLevels(DoorPermissionFlags.None), UnityEngine.Color.cyan, UnityEngine.Color.blue, UnityEngine.Color.gray, 2, "123456789123");
         }
@@ -40,9 +39,9 @@ namespace DarkRP.Modules.Items
            
         }
 
-        public  static bool IsKey(LabApi.Features.Wrappers.Item item)
+        public  static bool IsKey(Item item)
         {
-            return item != null && item is LabApi.Features.Wrappers.KeycardItem && ((LabApi.Features.Wrappers.KeycardItem)item).Type == ItemType.KeycardCustomMetalCase;
+            return item != null && item is KeycardItem && ((KeycardItem)item).Type == ItemType.KeycardCustomMetalCase;
         }
         void PlayerDropping(PlayerDroppingItemEventArgs e)
         {
@@ -63,12 +62,12 @@ namespace DarkRP.Modules.Items
         }
         void InteractingLocker(PlayerInteractingLockerEventArgs e)
         {
-            if (IsKey(e.Player.CurrentItem) && !Modules.Entities.Door.Singleton.Config.KeysCanActAsKeycard)
+            if (IsKey(e.Player.CurrentItem) && !Entities.Door.Singleton.Config.KeysCanActAsKeycard)
                 e.IsAllowed = false;
         }
         void InteractingGenerator(PlayerInteractingGeneratorEventArgs e)
         {
-            if (IsKey(e.Player.CurrentItem) && !Modules.Entities.Door.Singleton.Config.KeysCanActAsKeycard)
+            if (IsKey(e.Player.CurrentItem) && !Entities.Door.Singleton.Config.KeysCanActAsKeycard)
                 e.IsAllowed = false;
         }
         void InteractingDoor(PlayerInteractingDoorEventArgs e)
@@ -83,7 +82,7 @@ namespace DarkRP.Modules.Items
 
             if (!rpdoor.HasPermission(e.Player))
             {
-                if (!Modules.Entities.Door.Singleton.Config.KeysCanActAsKeycard)
+                if (!Entities.Door.Singleton.Config.KeysCanActAsKeycard)
                 {
                     e.IsAllowed = false;
                 }

@@ -2,13 +2,15 @@
 using LabApi.Features.Wrappers;
 using DarkRP.Extensions;
 using System;
+using DarkRP.Modules.Players.Jobs;
+using LabApi.Features.Console;
 
 namespace DarkRP.Modules.Players.HUD
 {
     public class HUDConfig
     {
         public bool Enabled { get; set; } = true;
-        public string Layout = "<br><br><align=\"center\">{topnotify3}<br>{topnotify2}<br>{topnotify1}</align><br><br><br><br><br><br><br><br><align=right>{notify5}<br>{notify4}<br>{notify3}<br>{notify2}<br>{notify1}<br></align><br>\t<align=left>{job}  <color=#55ff55>${money}</color>\t{wanted}</align>";
+        public string Layout = "<br><br><align=\"center\">{topnotify3}<br>{topnotify2}<br>{topnotify1}</align><br><align=right><br>{law0}<br>{law1}<br>{law2}<br>{law3}<br>{law4}<br><br>{notify5}<br>{notify4}<br>{notify3}<br>{notify2}<br>{notify1}<br></align><br>\t<align=left>{job}  <color=#55ff55>${money}</color>\t{wanted}</align>";
     }
 
 
@@ -51,11 +53,15 @@ namespace DarkRP.Modules.Players.HUD
                     for (int i = 0; i < 3; i++)
                         hud = hud.Replace("{topnotify" + (i + 1).ToString() + "}", topnotifications.Count > i ? topnotifications[i].Message : "");
 
+                    var laws = Mayor.Laws.ToArray();
+                    for (int i = 0; i < 5; i++) // Disable showing laws, wait until display kit is added
+                        hud = hud.Replace("{law" + i + "}", false && i < laws.Length ?  $"{i+1}. " + laws[i] : "");
+
                     p.SendHint(hud, HintEffects, 0.7f);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
+                    Logger.Error(e.ToString());
                 }
             }
         }

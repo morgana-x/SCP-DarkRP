@@ -5,7 +5,7 @@ using LabApi.Features.Wrappers;
 using DarkRP.Modules.Players.Jobs;
 
 
-namespace DarkRP.Commands.RP
+namespace DarkRP.Commands.DarkRP
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     public class Law : ParentCommand, ICommand
@@ -13,7 +13,7 @@ namespace DarkRP.Commands.RP
         public override string Command { get; } = "law";
         public override string Description { get; } = ".law add/remove/reset law/index)";
 
-        public override string[] Aliases { get; } = new string[] { };
+        public override string[] Aliases { get; } = new string[] { "laws" };
         public override void LoadGeneratedCommands() { }
 
         protected override bool ExecuteParent(ArraySegment<string> args, ICommandSender sender, out string response)

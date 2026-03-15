@@ -50,7 +50,7 @@ namespace DarkRP.Modules.Players.Jobs
                 ResetLaws();
         }
 
-        void OnJobChanging(object s, JobChangingEventArgs e)
+        void OnJobChanging(JobChangingEventArgs e)
         {
             if (e.Player != null && IsMayor(e.Player))
                 ResetLaws();

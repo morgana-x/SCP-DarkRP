@@ -4,7 +4,7 @@ using CommandSystem;
 using LabApi.Features.Wrappers;
 using DarkRP.Extensions;
 using DarkRP.Modules.Entities;
-namespace DarkRP.Commands.RP
+namespace DarkRP.Commands.DarkRP
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     public class Door : ParentCommand, ICommand

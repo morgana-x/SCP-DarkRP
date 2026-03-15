@@ -27,7 +27,7 @@ namespace DarkRP.Commands.Admin
             response = "Attempting to spawn " + args.First();
             var prot = pl.Rotation.eulerAngles;
             var rot = UnityEngine.Quaternion.Euler(prot.x, 0, 0);
-            var ent = DarkRP.Singleton.Entities.SpawnEntity(args.First(), pl.Camera.position + pl.Camera.forward, rot, owner:pl);
+            var ent = DarkRPPlugin.Singleton.Entities.SpawnEntity(args.First(), pl.Camera.position + pl.Camera.forward, rot, owner: pl);
             return true;
         }
     }

@@ -4,7 +4,7 @@ using System;
 
 namespace DarkRP
 {
-    public class DarkRP : Plugin
+    public class DarkRPPlugin : Plugin
     {
         public override string Name => "DarkRP";
 
@@ -19,7 +19,7 @@ namespace DarkRP
         public Module Modules;
         public Entity Entities;
 
-        public static DarkRP Singleton;
+        public static DarkRPPlugin Singleton;
 
    
         public override void Enable()

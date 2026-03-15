@@ -405,7 +405,8 @@ namespace DarkRP.Modules.Players
 
         void Joined(PlayerJoinedEventArgs e)
         {
-           
+            SetJob(e.Player, Singleton.Config.DefaultJob);
+            e.Player.Health = e.Player.MaxHealth;
         }
 
         void Left(PlayerLeftEventArgs e)
@@ -658,7 +659,7 @@ namespace DarkRP.Modules.Players
             if (Singleton == null) return "";
 
             if (!Singleton.PlayerRoles.ContainsKey(player))
-                SetJob(player, Singleton.Config.DefaultJob);
+                return Singleton.Config.DefaultJob;
 
             return Singleton.PlayerRoles[player];
         }

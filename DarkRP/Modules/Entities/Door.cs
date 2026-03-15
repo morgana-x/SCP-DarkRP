@@ -346,7 +346,7 @@ namespace DarkRP.Modules.Entities
             }
         }
 
-        void JobChanged(object sender, Events.Arguments.Player.JobChangedEventArgs e)
+        void JobChanged(Events.Arguments.Player.JobChangedEventArgs e)
         {
             foreach (var d in GetOwnedDoors(e.Player))
                 d.UpdateText();

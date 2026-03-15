@@ -50,12 +50,12 @@ namespace DarkRP
         {
             Health = MaxHealth;
             OnCreate(position, rotation);
-            DarkRP.Singleton.Entities.AddSpawnedEntity(this);
+            DarkRPPlugin.Singleton.Entities.AddSpawnedEntity(this);
         }
         public void Destroy()
         {
             OnDestroy();
-            DarkRP.Singleton.Entities.RemoveSpawnedEntity(this);
+            DarkRPPlugin.Singleton.Entities.RemoveSpawnedEntity(this);
             if (CoreObject != null)
                 NetworkServer.Destroy(CoreObject);
         }
@@ -72,13 +72,13 @@ namespace DarkRP
         public override void LoadConfigs()
         {
 
-            string filepath = DarkRP.Singleton.GetConfigPath("Entities/" + this.GetType().Name + ".yml");
+            string filepath = DarkRPPlugin.Singleton.GetConfigPath("Entities/" + this.GetType().Name + ".yml");
 
             if (!Directory.Exists(Directory.GetParent(filepath).FullName))
                 Directory.CreateDirectory(Directory.GetParent(filepath).FullName);
 
             LabApi.Features.Console.Logger.Info($"Loading {this.GetType().Name + ".yml"}...");
-            if (DarkRP.Singleton.TryLoadConfig<TConfig>(filepath, out TConfig? config))
+            if (DarkRPPlugin.Singleton.TryLoadConfig<TConfig>(filepath, out TConfig? config))
                 Config = config;
         }
     }

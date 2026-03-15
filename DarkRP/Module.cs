@@ -26,13 +26,13 @@ namespace DarkRP
         public override void LoadConfigs()
         {
    
-            string filepath = DarkRP.Singleton.GetConfigPath("Modules/"+ this.GetType().Name + ".yml");
+            string filepath = DarkRPPlugin.Singleton.GetConfigPath("Modules/"+ this.GetType().Name + ".yml");
 
             if (!Directory.Exists(Directory.GetParent(filepath).FullName))
                 Directory.CreateDirectory(Directory.GetParent(filepath).FullName);
 
             Logger.Info($"Loading {this.GetType().Name + ".yml"}...");
-            if (DarkRP.Singleton.TryLoadConfig<TConfig>(filepath, out TConfig? config))
+            if (DarkRPPlugin.Singleton.TryLoadConfig<TConfig>(filepath, out TConfig? config))
                 Config = config;
         }
     }

@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Management.Instrumentation;
-using System.Reflection;
 using CommandSystem;
 using LabApi.Features.Wrappers;
 using DarkRP.Extensions;
-using DarkRP.Modules.Entities;
 using DarkRP.Modules.Players.Jobs;
 
 
-namespace DarkRP.Commands.RP
+namespace DarkRP.Commands.DarkRP
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     public class Hit : ParentCommand, ICommand

@@ -2,7 +2,7 @@
 using CommandSystem;
 using DarkRP.Modules.Players;
 
-namespace DarkRP.Commands.RP
+namespace DarkRP.Commands.DarkRP
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     public class JobList : ParentCommand, ICommand

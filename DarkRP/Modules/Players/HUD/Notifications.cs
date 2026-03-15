@@ -51,6 +51,7 @@ namespace DarkRP.Modules.Players.HUD
         public static Notifications Singleton;
         public override void Load()
         {
+            Singleton = this;
             PlayerEvents.Left += Left;
         }
 

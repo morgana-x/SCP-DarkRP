@@ -5,7 +5,7 @@ using System.Reflection;
 using CommandSystem;
 
 
-namespace DarkRP.Commands.RP
+namespace DarkRP.Commands.DarkRP
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     public class Help : ParentCommand, ICommand
@@ -22,7 +22,7 @@ namespace DarkRP.Commands.RP
             response = "\nCommands:\n";
             var classes = Assembly.GetExecutingAssembly()
                          .GetTypes()
-                         .Where(t => t.IsClass && t.Namespace.StartsWith("SCPRP.Commands.RP"))
+                         .Where(t => t.IsClass && t.Namespace.Contains("Commands.DarkRP"))
                          .ToList();
 
             foreach (var type in classes.Where((x) => { return x.IsSubclassOf(typeof(ParentCommand)); }))

@@ -2,11 +2,9 @@
 using System.Linq;
 using CommandSystem;
 using LabApi.Features.Wrappers;
-using DarkRP.Extensions;
-using DarkRP.Modules.Entities;
 using DarkRP.Modules.Players;
 
-namespace DarkRP.Commands.RP
+namespace DarkRP.Commands.DarkRP
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     public class JobChange : ParentCommand, ICommand
