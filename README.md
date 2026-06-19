@@ -1,4 +1,4 @@
-# SCP DarkRP ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/morgana-x/SCPRP/total)
+# SCP DarkRP ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/morgana-x/SCP-DarkRP/total)
 
 Highly configurable Jobs, Purchasable items and micellaneous options
 
